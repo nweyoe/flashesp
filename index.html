@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BLE Jammer · ESP32 Flasher</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(145deg, #0a0f1e 0%, #0a0f1e 100%);
+            font-family: 'Segoe UI', system-ui, -apple-system, 'Inter', sans-serif;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            color: #edf2ff;
+        }
+        .card {
+            max-width: 700px;
+            margin: 0 auto;
+            background: rgba(15, 25, 45, 0.65);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            border: 1px solid rgba(0, 200, 200, 0.25);
+            padding: 2rem;
+            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.4);
+        }
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, #5bc0ff, #a855f7);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            border-left: 4px solid #2dd4bf;
+            padding-left: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .badge {
+            background: #1e2a4a;
+            padding: 0.25rem 0.75rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            color: #9ac8ff;
+            display: inline-block;
+        }
+        .info {
+            background: #0f172a70;
+            padding: 0.9rem;
+            border-radius: 1rem;
+            margin: 1.2rem 0;
+            font-size: 0.85rem;
+            border-left: 3px solid #f97316;
+        }
+        .hw-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin: 1.5rem 0;
+        }
+        .hw-item {
+            background: #0a0f1ccc;
+            border: 1px solid #253a60;
+            border-radius: 1rem;
+            padding: 0.8rem 1rem;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .hw-item:hover {
+            background: #111d32;
+            border-color: #2dd4bf;
+            transform: translateX(5px);
+        }
+        .hw-item.selected {
+            border-color: #2dd4bf;
+            background: #0e1a2f;
+            box-shadow: 0 0 8px rgba(45, 212, 191, 0.3);
+        }
+        .hw-item label {
+            display: flex;
+            gap: 12px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        input[type="radio"] {
+            accent-color: #2dd4bf;
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+        }
+        .pin {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.68rem;
+            color: #7aaef0;
+            margin-left: 30px;
+            margin-top: 6px;
+        }
+        .btn-wrapper {
+            text-align: center;
+            margin: 1.8rem 0 1rem;
+        }
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            border-top: 1px solid #2a3a60;
+            padding-top: 1.2rem;
+            display: flex;
+            justify-content: center;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+        .footer a {
+            color: #93c5fd;
+            text-decoration: none;
+            background: #1e2a4770;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            transition: 0.2s;
+        }
+        .footer a:hover {
+            background: #2dd4bf30;
+            color: white;
+        }
+        .invisible { visibility: hidden; }
+        @media (max-width: 550px) {
+            .card { padding: 1.3rem; }
+            h1 { font-size: 1.4rem; }
+        }
+    </style>
+    <script type="module" src="https://unpkg.com/esp-web-tools@8.0.1/dist/web/install-button.js?module"></script>
+</head>
+<body>
+<div class="card">
+    <h1>📡 BLE JAMMER · ESP32 FLASHER</h1>
+    <div class="badge">nRF24L01 · 3 configs</div>
+    <div class="info">
+        ⚡ ESP32 ကို USB ချိတ်ပါ → Hardware ရွေးပါ → Connect → Port ရွေး → Flash
+    </div>
+
+    <div class="hw-list" id="hardwareList">
+        <div class="hw-item" data-manifest="web/manifest_Ble1.json">
+            <label><input type="radio" name="type" value="Ble1">
+                <div><strong>🔹 Single NRF24L01 · VSPI</strong>
+                <div class="pin">📌 SCK=18 , MISO=19 , MOSI=23 , CS=21 , CE=22</div></div>
+            </label>
+        </div>
+        <div class="hw-item" data-manifest="web/manifest_Ble2.json">
+            <label><input type="radio" name="type" value="Ble2">
+                <div><strong>🔸 Dual NRF24L01 · VSPI + HSPI</strong>
+                <div class="pin">⚡ full duplex · both radios active</div></div>
+            </label>
+        </div>
+        <div class="hw-item" data-manifest="web/manifest_Ble3.json">
+            <label><input type="radio" name="type" value="Ble3">
+                <div><strong>🔹 Single NRF24L01 · HSPI</strong>
+                <div class="pin">📌 SCK=14 , MISO=12 , MOSI=13 , CS=15 , CE=16</div></div>
+            </label>
+        </div>
+    </div>
+
+    <div class="btn-wrapper">
+        <esp-web-install-button class="invisible"></esp-web-install-button>
+    </div>
+
+    <div class="footer">
+        <a href="https://github.com/nweyoe" target="_blank">🐙 GitHub / nweyoe</a>
+        <a href="http://nweyoe.net" target="_blank">🌐 NweYoe.net</a>
+    </div>
+</div>
+
+<script>
+    const radios = document.querySelectorAll('input[name="type"]');
+    const btn = document.querySelector('esp-web-install-button');
+    const items = document.querySelectorAll('.hw-item');
+    const manifestMap = {
+        'Ble1': 'web/manifest_Ble1.json',
+        'Ble2': 'web/manifest_Ble2.json',
+        'Ble3': 'web/manifest_Ble3.json'
+    };
+    function clearSelected() {
+        items.forEach(i => i.classList.remove('selected'));
+    }
+    radios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            clearSelected();
+            const parent = e.target.closest('.hw-item');
+            parent.classList.add('selected');
+            const val = e.target.value;
+            btn.manifest = manifestMap[val];
+            btn.classList.remove('invisible');
+        });
+    });
+    btn.classList.add('invisible');
+</script>
+</body>
+</html>
