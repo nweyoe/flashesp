@@ -1,22 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="my">
 <head>
     <meta charset="UTF-8">
     <title>BLE Jammer · ESP32 Flasher</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-
-        @font-face {font-family:"MasterpieceUniType";src:local('Masterpiece Uni Type'),url('https://cdn.jsdelivr.net/gh/saturngod/myanmar-unicode-fonts@master/docs/masterpiece/MasterpieceUniType.ttf') format('truetype');}
+	 @font-face {font-family:"MasterpieceUniType";src:local('Masterpiece Uni Type'),url('https://cdn.jsdelivr.net/gh/saturngod/myanmar-unicode-fonts@master/docs/masterpiece/MasterpieceUniType.ttf') format('truetype');}
         * { margin: 0; padding: 0; box-sizing: border-box; }
+	
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
-            background: linear-gradient(145deg, #0a0f1e 0%, #0a0f1e 100%);
-            font-family: 'Segoe UI', system-ui, -apple-system, 'Inter', sans-serif;
+            background: linear-gradient(145deg, #0a0f1e 0%, #030712 100%);
+            font-family: 'Segoe UI', system-ui, -apple-system, 'Inter', 'Noto Sans Myanmar', sans-serif;
             min-height: 100vh;
             padding: 2rem 1rem;
             color: #edf2ff;
         }
         .card {
-            max-width: 700px;
+            max-width: 850px;
             margin: 0 auto;
             background: rgba(15, 25, 45, 0.65);
             backdrop-filter: blur(12px);
@@ -44,12 +49,76 @@
             color: #9ac8ff;
             display: inline-block;
         }
+        .section-title {
+			font-family:MasterpieceUniType;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.8rem 0;
+            padding-bottom: 0.3rem;
+            border-bottom: 2px solid #2dd4bf;
+            display: inline-block;
+        }
+        .pin-table {
+            background: #0a0f1ccc;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 1px solid #253a60;
+            overflow-x: auto;
+        }
+        .pin-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .pin-table th, .pin-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #2a3a60;
+        }
+        .pin-table th {
+            color: #2dd4bf;
+            font-weight: 600;
+        }
+        .pin-table code {
+            font-family: 'Fira Code', monospace;
+            color: #7aaef0;
+            background: #1a1a3e;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+        .image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin: 1rem 0;
+            justify-content: center;
+        }
+        .image-card {
+            background: #0a0f1ccc;
+            border-radius: 1rem;
+            border: 1px solid #253a60;
+            padding: 0.8rem;
+            text-align: center;
+            flex: 1;
+            min-width: 200px;
+        }
+        .image-card img {
+            max-width: 100%;
+            border-radius: 0.8rem;
+            border: 1px solid #2dd4bf40;
+        }
+        .image-caption {
+            font-size: 0.75rem;
+            color: #9ac8ff;
+            margin-top: 0.5rem;
+        }
         .info {
             background: #0f172a70;
             padding: 0.9rem;
             border-radius: 1rem;
             margin: 1.2rem 0;
-            font-family:MasterpieceUniType;
+			font-family:MasterpieceUniType;
             font-size: 0.85rem;
             border-left: 3px solid #f97316;
         }
@@ -122,10 +191,13 @@
             background: #2dd4bf30;
             color: white;
         }
-        .invisible { visibility: hidden; }
-        @media (max-width: 550px) {
-            .card { padding: 1.3rem; }
-            h1 { font-size: 1.4rem; }
+        .invisible {
+            visibility: hidden;
+        }
+        @media (max-width: 600px) {
+            .card { padding: 1.2rem; }
+            h1 { font-size: 1.3rem; }
+            .pin-table th, .pin-table td { padding: 6px 8px; font-size: 0.75rem; }
         }
     </style>
     <script type="module" src="https://unpkg.com/esp-web-tools@8.0.1/dist/web/install-button.js?module"></script>
@@ -133,14 +205,19 @@
 <body>
 <div class="card">
     <h1>📡 BLE JAMMER · ESP32 FLASHER</h1>
-    <div class="badge">nRF24L01 · 3 configs</div>
+    <div class="badge">nRF24L01 · လမ်းညွှန်ချက်များ</div>
+
+    <!-- Flash -->
     <div class="info">
-        ⚡ <strong>ညွှန်ကြားချက် (Instructions)</strong><br/>
-        • ESP32 ကို USB နဲ့ ချိတ်ပါ → Connect နှိပ်ပါ → Port ရွေးပါ → Flash လုပ်ပါ<br/>
-        • Nrf24l01 နဲ့ ESP32 ကို ရွေးထားတဲ့ version အတိုင်း GPIO pin မှန်မှန် တွဲပေးရန်<br/>
-        • <strong>⚠️ Educational purpose only</strong>
+        ⚡ <strong>အသုံးပြုနည်း (Instructions)</strong><br/>
+        • အောက်ပါ Pin များအတိုင်း NRF24L01 နဲ့ ESP32 ကို ချိတ်ဆက်ပါ<br/>
+        • ESP32 ကို ကွန်ပျူတာနဲ့ USB ချိတ်ပါ<br/>
+        • Hardware ရွေးချယ်မှု (Single/Dual) ရွေးပါ → Connect → Port ရွေးပါ → Flash လုပ်ပါ<br/>
+        • <strong>⚠️ ပညာရေးဆိုင်ရာ ရည်ရွယ်ချက်အတွက်သာ (Educational purpose only)</strong>
     </div>
 
+    <!-- Hardware (Flasher) -->
+    <div class="section-title">⚡ Hardware ရွေးချယ်ပါ (Select Hardware)</div>
     <div class="hw-list" id="hardwareList">
         <div class="hw-item" data-manifest="web/manifest_Ble1.json">
             <label><input type="radio" name="type" value="Ble1">
@@ -151,7 +228,7 @@
         <div class="hw-item" data-manifest="web/manifest_Ble2.json">
             <label><input type="radio" name="type" value="Ble2">
                 <div><strong>🔸 Dual NRF24L01 · VSPI + HSPI</strong>
-                <div class="pin">⚡ full duplex · both radios active</div></div>
+                <div class="pin">⚡ နှစ်လုံးသုံး - full duplex</div></div>
             </label>
         </div>
         <div class="hw-item" data-manifest="web/manifest_Ble3.json">
@@ -162,13 +239,56 @@
         </div>
     </div>
 
+    <!-- Flash Button -->
     <div class="btn-wrapper">
         <esp-web-install-button class="invisible"></esp-web-install-button>
     </div>
+	
+	 <!-- 📸 Wiring Guide  -->
+    <div class="section-title">🔧 တပ်ဆင်ပုံများ (Wiring Guide)</div>
+    <div class="image-gallery">
+        <div class="image-card">
+            <img src="web/1nrf.jpg" alt="Single NRF24L01" onerror="this.src='https://via.placeholder.com/300x200?text=1nrf.jpg+Not+Found'">
+            <div class="image-caption">🔹 တစ်လုံးတပ်ဆင်ထားပုံ<br>Single NRF24L01</div>
+        </div>
+        <div class="image-card">
+            <img src="web/2nrf.jpg" alt="Dual NRF24L01" onerror="this.src='https://via.placeholder.com/300x200?text=2nrf.jpg+Not+Found'">
+            <div class="image-caption">🔸 နှစ်လုံးတပ်ဆင်ထားပုံ<br>Dual NRF24L01</div>
+        </div>
+    </div>
+    <p style="font-size: 0.7rem; text-align: center; color: #6c8fc7;">www.nweyoe.net</p>
 
+    <!-- 📌 PIN Connections -->
+    <div class="section-title">📌 NRF24L01 ကို ESP32 နဲ့ တွဲဆက်ပုံ (Pins)</div>
+    <div class="pin-table">
+        <table>
+            <thead>
+                <tr><th colspan="2">🔸 DUAL / TWO NRF24L01</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>HSPI</code></td><td>SCK=14, MISO=12, MOSI=13, CS=15, CE=16</td></tr>
+                <tr><td><code>VSPI</code></td><td>SCK=18, MISO=19, MOSI=23, CS=21, CE=22</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pin-table">
+        <table>
+            <thead>
+                <tr><th colspan="2">🔹 SINGLE / ONE NRF24L01 (VSPI သို့ HSPI ရွေးနိုင်)</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>VSPI</code></td><td>SCK=18, MISO=19, MOSI=23, CS=21, CE=22</td></tr>
+                <tr><td><code>HSPI</code></td><td>SCK=14, MISO=12, MOSI=13, CS=15, CE=16</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Footer -->
     <div class="footer">
         <a href="https://github.com/nweyoe" target="_blank">🐙 GitHub / nweyoe</a>
-        <a href="http://nweyoe.net" target="_blank">🌐 nweyoe.net</a>
+        <a href="http://nweyoe.net" target="_blank">🌐 NweYoe.net</a>
+        <span style="color:#6c8fc7;">🛠️ 3 configs · ESP32</span>
     </div>
 </div>
 
@@ -188,10 +308,12 @@
         radio.addEventListener('change', (e) => {
             clearSelected();
             const parent = e.target.closest('.hw-item');
-            parent.classList.add('selected');
+            if (parent) parent.classList.add('selected');
             const val = e.target.value;
-            btn.manifest = manifestMap[val];
-            btn.classList.remove('invisible');
+            if (btn && manifestMap[val]) {
+                btn.manifest = manifestMap[val];
+                btn.classList.remove('invisible');
+            }
         });
     });
     btn.classList.add('invisible');
